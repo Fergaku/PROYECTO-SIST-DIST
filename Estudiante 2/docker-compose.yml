@@ -1,0 +1,48 @@
+services:
+
+  mysql:
+    image: mysql:8
+
+    container_name: inventario_db
+
+    environment:
+      MYSQL_DATABASE: inventario
+      MYSQL_USER: max
+      MYSQL_PASSWORD: password
+      MYSQL_ROOT_PASSWORD: rootpassword
+
+    ports:
+      - "3306:3306"
+
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+
+    networks:
+      - inventario_net
+
+  reportes:
+    build: ./reportes
+
+    container_name: sistema_reportes
+
+    environment:
+      DB_HOST: mysql
+      DB_NAME: inventario
+      DB_USER: max
+      DB_PASSWORD: password
+
+    ports:
+      - "5000:5000"
+
+    depends_on:
+      - mysql
+
+    networks:
+      - inventario_net
+
+networks:
+  inventario_net:
+
+volumes:
+  mysql_data:
